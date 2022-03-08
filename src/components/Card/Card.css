@@ -1,0 +1,10 @@
+.card {
+    background-color: #EBEEEA;
+    border-radius: 6px;
+    position: relative;
+}
+
+.card__link{
+    text-decoration: none;
+    color: unset;
+}
