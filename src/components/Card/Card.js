@@ -1,31 +1,37 @@
 import React from 'react';
 import './Card.css'
-import { IconButton } from '@mui/material';
-import AboutCatForm from '../AboutCatForm/AboutCatForm';
-import DeleteIcon from '@mui/icons-material/Delete';
-import EditIcon from '@mui/icons-material/Edit';
+import {Button, IconButton} from '@mui/material';
+import catImage from '../../images/cat-image.jpg';
+import {ThemeProvider} from '@mui/material/styles';
+import {theme} from '../../theme';
+import {Link} from 'react-router-dom';
+import Icons from '../Icons/Icons';
 
 function Card({card, link, onCardClick, onCardEditClick, onCardDeleteClick, onBookClick }) {
 
-  function handleEditClick() {
-    onCardEditClick(card);
+  function handleCardClick() {
+    onCardClick(card);
   }
 
-  function handleDeleteClick() {
-    onCardDeleteClick(card);
+  function handleBookClick() {
+    onBookClick(card);
   }
 
   return(
-      <div className={'card'}>
-        <AboutCatForm link={link} card={card} onCardClick={onCardClick} onBookClick={onBookClick} />
-        <IconButton aria-label="delete" sx={{position: 'absolute', right: '15px', bottom: '15px'}} onClick={handleDeleteClick}>
-          <DeleteIcon />
-        </IconButton>
-        <IconButton aria-label="edit" sx={{position: 'absolute', right: '60px', bottom: '15px'}} onClick={handleEditClick}>
-          <EditIcon />
-        </IconButton>
+      <div className="card">
+        <div className="card-container">
+          <img className="card__image" alt={card ? card.name : "Имя"} src={card.image != null ? card.image : catImage} />
+          <div className="card__main">
+            <p className="card__title">{card.nameCat}</p>
+            <p className="card__price">{card.price} &#8381; / час</p>
+            <ThemeProvider theme={theme}>
+              <Button variant="contained" color={card.isBooked ? "secondary" : "primary"} size="small" onClick={handleBookClick} sx={{mt: 1, mb: 1}}>{card.isBooked ? "Снять бронь" : "Бронировать"}</Button>
+            </ThemeProvider>
+            <Link className="card__link" to={link} onClick={handleCardClick}>Узнать больше &rarr;</Link>
+          </div>
+        </div>
+        <Icons card={card} onCardEditClick={onCardEditClick} onCardDeleteClick={onCardDeleteClick}/>
       </div>
-
   )
 }
 

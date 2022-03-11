@@ -61,7 +61,7 @@
     position: absolute;
     top: 0;
     left: 0;
-    background: #D3A151;
+    background: #F3A93E;
     border-radius: 50px;
 }
 
@@ -77,12 +77,12 @@
 }
 
 .preloader__round::after {
-    background: #885062;
+    background: #96BCC5;
     animation: preloader-inside-background 1s ease-in-out infinite;
 }
 
 .preloader__round::before {
     z-index: 2;
-    background: #D3A151;
+    background: #F3A93E;
     animation: preloader-inside-inner 1s ease-in-out infinite;
 }

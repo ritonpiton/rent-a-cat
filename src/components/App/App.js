@@ -1,14 +1,16 @@
 import React from 'react';
+import {useLocation, useNavigate} from 'react-router-dom';
 import "./App.css"
 import Header from '../Header/Header';
 import Main from '../Main/Main';
 import Footer from '../Footer/Footer';
-import InfoPage from '../InfoPage/InfoPage'
-import AddCatPopup from '../AddCatPopup/AddCatPopup';
+import EditCatPopup from '../EditCatPopup/EditCatPopup';
 import * as catsApi from '../../utils/catsApi';
 import DeleteCatPopup from '../DeleteCatPopup/DeleteCatPopup';
 
 function App() {
+  const navigate = useNavigate();
+  const pathname = useLocation().pathname;
   const [allBreeds, setAllBreeds] = React.useState([]);
   const [initialCards, setInitialCards] = React.useState([]); // карточки из стороннего API
   const [avalibleCats, setAvalibleCats] = React.useState([]); // доступные коты
@@ -23,8 +25,6 @@ function App() {
 
   // ОШИБКИ
   const [serverError, setServerError] = React.useState(false);
-  const [errorText, setErrorText] = React.useState('');
-  const [savingStatus, setSavingStatus] = React.useState('');
 
   React.useEffect(() => {
     if (initialCards.length <= 0) {
@@ -51,7 +51,6 @@ function App() {
           console.log(`Ошибка получения карточек из базы \n${err}`);
           setServerError(true);
         })
-
     }
   }, [])
 
@@ -60,7 +59,7 @@ function App() {
     if (selectedFilter === 0) {
       catsApi.getInitialCards()
         .then(allCardsArray => {
-          setInitialCards(allCardsArray.items);
+          allCardsArray !== undefined && setInitialCards(allCardsArray.items);
         })
         .catch((err) => {
           console.log(`Ошибка получения карточек из базы \n${err}`);
@@ -69,7 +68,7 @@ function App() {
     } else if (selectedFilter === 1) {
       catsApi.getAvalibleCats()
         .then(avalibleCatsArray => {
-          setAvalibleCats(avalibleCatsArray);
+          avalibleCatsArray !== undefined && setAvalibleCats(avalibleCatsArray);
         })
         .catch((err) => {
           console.log(`Ошибка получения свободных карточек из базы \n${err}`);
@@ -78,7 +77,7 @@ function App() {
     } else if (selectedFilter === 2) {
       catsApi.getBookedCats()
         .then(bookedCatsArray => {
-          setBookedCats(bookedCatsArray);
+          bookedCatsArray !== undefined && setBookedCats(bookedCatsArray);
         })
         .catch((err) => {
           console.log(`Ошибка получения забронированных карточек из базы \n${err}`);
@@ -100,10 +99,23 @@ function App() {
       })
   }
 
+  function handleEditCat(cat) {
+    catsApi.editCat(cat)
+      .then((newCat) => {
+        setInitialCards((state) => state.map((item) => item.id === cat.id ? newCat : item));
+        closeAllPopups();
+      })
+      .catch((err) => {
+        console.log(`Ошибка редактирования карточки \n${err}`);
+        setServerError(true);
+      })
+  }
+
   function handleDeleteCat(cat) {
     catsApi.deleteCat(cat.id)
       .then(() => {
-        setInitialCards((state) => state.filter((item) => !(item.id === cat.id) && item))
+        if (pathname !== '/') navigate('/');
+        setInitialCards((state) => state.filter((item) => !(item.id === cat.id) && item));
       })
       .catch((err) => console.log(`Ошибка удаления карточки \n${err}`))
     closeAllPopups();
@@ -146,14 +158,17 @@ function App() {
   }
 
   function closeAllPopups() {
-    addCatPopupOpen && setAddCatPopupOpen(false);
+    if (addCatPopupOpen) {
+      setAddCatPopupOpen(false);
+      setIsOnEdit(false);
+    }
     deleteCatPopupOpen && setDeleteCatPopupOpen(false);
   }
 
   return (
     <div className="app">
       <Header addCat={handleAddCat} isOpen={handleAddCatClick}/>
-      <AddCatPopup isOpen={addCatPopupOpen} breeds={allBreeds} isOpen={addCatPopupOpen} onAddCat={handleAddCat} onClose={closeAllPopups} isOnEditPage={onEdit}/>
+      <EditCatPopup isOpen={addCatPopupOpen} breeds={allBreeds} isOpen={addCatPopupOpen} onAddCat={handleAddCat} onEditCat={handleEditCat} onClose={closeAllPopups} isOnEditPage={onEdit} selectedCard={selectedCard}/>
       <DeleteCatPopup isOpen={deleteCatPopupOpen} onSubmit={handleDeleteCat} onClose={closeAllPopups} selectedCard={selectedCard}/>
       <Main cards={selectedFilter === 0 ? initialCards : selectedFilter === 1 ? avalibleCats : bookedCats}
             onSelectItem={handleSelectFilterItem}

@@ -54,6 +54,16 @@ export const getAllBreeds = () => {
     .then(res => checkResponse(res))
 }
 
+export const getCat = (catId) => {
+  return fetch(`${BASE_URL}/cats/${catId}`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  })
+    .then(res => checkResponse(res))
+}
+
 export const addCat = (cat) => {
   return fetch(`${BASE_URL}/cats/create_cat`, {
     method: 'POST',
@@ -65,6 +75,22 @@ export const addCat = (cat) => {
       color: cat.color,
       price: cat.price,
       age: cat.age,
+      nameBreed: cat.nameBreed,
+    })
+  })
+    .then(res => checkResponse(res))
+}
+
+export const editCat = (cat) => {
+  return fetch(`${BASE_URL}/cats/update_cat/${cat.id}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      nameCat: cat.nameCat,
+      color: cat.color,
+      price: cat.price,
       nameBreed: cat.nameBreed,
     })
   })

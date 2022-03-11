@@ -1,35 +1,22 @@
 import React from "react";
 import "./Main.css";
 import Cards from "../Cards/Cards";
-import Filter from "../Filter/Filter";
-import Preloader from "../Preloader/Preloader";
-import { Route, Switch } from 'react-router-dom';
-import InfoPage from '../InfoPage/InfoPage';
+import { Route, Routes, Navigate } from "react-router-dom";
+import InfoPage from "../InfoPage/InfoPage";
+import NotFoundPage from '../NotFoundPage/NotFoundPage';
 
-function Main({ cards, onSelectItem, onCardClick, onCardEditClick, onCardDeleteClick, onBookClick, selectedCard }) {
-  const [isLoading, setIsLoading] = React.useState(true);
-
-  // прелоадер
-  React.useEffect(() => {
-    const loadingTimeout = setTimeout(() => setIsLoading(false), 1000);
-    return () => clearTimeout(loadingTimeout);
-  }, []);
-
+function Main({ cards, onSelectItem, onCardClick, onCardEditClick, onCardDeleteClick, onBookClick }) {
   return (
     <main className="main">
-      <Filter onSelectItem={onSelectItem} />
-      {isLoading ? (
-        <Preloader />
-      ) : (
-        <Switch>
-          <Route exact path={'/'}>
-            <Cards cards={cards} onCardClick={onCardClick} onCardEditClick={onCardEditClick} onCardDeleteClick={onCardDeleteClick} onBookClick={onBookClick}/>
-          </Route>
-          <Route path={`/cats/:id`}>
-            <InfoPage card={selectedCard} onBookClick={onBookClick} isOnInfoPage={true}/>
-          </Route>
-        </Switch>
-      )}
+      <Routes>
+        <Route exact path={'/'} element={
+          <Cards cards={cards} onSelectItem={onSelectItem} onCardClick={onCardClick} onCardEditClick={onCardEditClick} onCardDeleteClick={onCardDeleteClick} onBookClick={onBookClick} />} />
+        <Route path={`/cats/:id`} element={
+          <InfoPage onBookClick={onBookClick} onCardEditClick={onCardEditClick} onCardDeleteClick={onCardDeleteClick} />} />
+        <Route path='not-found' element={<NotFoundPage />} />
+        <Route path='/*' element={<Navigate to='/not-found' />} />
+      </Routes>
+
     </main>
   );
 }

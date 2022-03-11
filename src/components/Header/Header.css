@@ -7,12 +7,31 @@
     justify-content: space-between;
     margin: 0 auto;
 
-    height: 74px;
-    font-size: 18px;
+    height: 10vh;
+    font-size: 16px;
+    padding: 5px;
+    box-sizing: border-box;
 }
 
 .header__container{
     display: flex;
     align-items: center;
     justify-content: center;
+}
+
+.header__link {
+    display: flex;
+    color: unset;
+    text-decoration: none;
+    align-items: center;
+}
+
+.header__title{
+    font-size: 16px;
+}
+
+@media screen and (max-width: 767px) {
+    .header__title{
+        font-size: 12px;
+    }
 }

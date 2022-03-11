@@ -13,63 +13,83 @@ import { theme } from "../../theme";
 import { ThemeProvider } from "@mui/material/styles";
 import { useFormWithValidation } from "../../utils/useFormWithValidation";
 
-function EditCatForm({ breeds, onAddCat, isOnEditPage }) {
+function EditCatForm({ breeds, onAddCat, onEditCat, isOnEditPage, selectedCard }) {
   const { values, isValid, handleChange } = useFormWithValidation({});
 
   const breedsName = breeds.map((item) => item.nameBreed);
 
   const colorsArray = ["чёрный", "белый", "серый", "рыжий", "многоцветный"];
 
+  const [name, setName] = React.useState("");
+  const [price, setPrice] = React.useState("");
+  const [age, setAge] = React.useState("");
   const [color, setColor] = React.useState("");
   const [breed, setBreed] = React.useState("");
 
   // После загрузки текущего пользователя из API
   // его данные будут использованы в управляемых компонентах.
   React.useEffect(() => {
-    if ((currentCat) !== undefined ) {
-      setName(currentUser.name);
-      setDescription(currentUser.about);
+    if (isOnEditPage && selectedCard != null) {
+      setName(selectedCard.nameCat);
+      setPrice(selectedCard.price);
+      setBreed(selectedCard.breed.nameBreed);
+      setColor(selectedCard.color);
+      setAge(selectedCard.age);
+    } else {
+      setName("");
+      setPrice("");
+      setBreed("");
+      setColor("");
+      setAge("");
     }
-  }, [currentUser, isOpen]);
+  }, [isOnEditPage]);
 
   function handleSelectChange(event) {
     const {
-      target: { value, name }
+      target: { value, name },
     } = event;
     name === "breed-select" ? setBreed(value) : setColor(value);
   }
 
   function handleSubmit(e) {
     e.preventDefault();
-    onAddCat({
-      nameCat: values.name,
-      price: values.price,
-      color,
-      age: values.age,
-      nameBreed: breed,
-    });
+    isOnEditPage
+      ? onEditCat({
+          id: selectedCard.id,
+          nameCat: values.name,
+          price: values.price,
+          color,
+          nameBreed: breed,
+        })
+      : onAddCat({
+          nameCat: values.name,
+          price: values.price,
+          color,
+          age: values.age,
+          nameBreed: breed,
+        });
   }
 
   return (
     <form className="form">
-        <TextField
-          sx={{ mt: 1, mb: 1 }}
-          id="standard-required"
-          variant="standard"
-          label="Имя"
-          value={values.name || ""}
-          type="text"
-          name="name"
-          onChange={handleChange}
-          required
-        />
+      <TextField
+        sx={{ mt: 1, mb: 1 }}
+        id="standard-required"
+        variant="standard"
+        label="Имя"
+        value={values.name || name}
+        type="text"
+        name="name"
+        onChange={handleChange}
+        required
+      />
 
       <TextField
         sx={{ mt: 1, mb: 1 }}
         id="standard-required"
         variant="standard"
         label="Цена за час"
-        value={values.price || ""}
+        value={values.price || price}
         type="number"
         name="price"
         onChange={handleChange}
@@ -114,18 +134,19 @@ function EditCatForm({ breeds, onAddCat, isOnEditPage }) {
 
       <TextField
         sx={{ mt: 1, mb: 1 }}
-        id="standard-required"
+        id={`${isOnEditPage ? "standard-disabled" : "standard-required"}`}
         variant="standard"
         label="Возраст"
-        value={values.age || ""}
+        value={values.age || age}
         type="number"
         name="age"
         onChange={handleChange}
-        required
+        required={!isOnEditPage && true}
+        disabled={isOnEditPage && true}
       />
 
       <ThemeProvider theme={theme}>
-        {isValid ?
+        {isValid || isOnEditPage ? (
           <Button
             sx={{ mt: 1, mb: 1 }}
             variant="contained"
@@ -134,7 +155,7 @@ function EditCatForm({ breeds, onAddCat, isOnEditPage }) {
           >
             {isOnEditPage ? "Сохранить" : "Добавить"}
           </Button>
-          :
+        ) : (
           <Button
             sx={{ mt: 1, mb: 1 }}
             variant="contained"
@@ -143,7 +164,7 @@ function EditCatForm({ breeds, onAddCat, isOnEditPage }) {
           >
             {isOnEditPage ? "Сохранить" : "Добавить"}
           </Button>
-        }
+        )}
       </ThemeProvider>
     </form>
   );
